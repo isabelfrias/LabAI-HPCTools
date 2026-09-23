@@ -13,11 +13,12 @@
 #Activate python environment
 source $STORE/mypython/bin/activate
 
-cd $LUSTRE/HPCTools/LabAI
-time python run_qa.py \
+#Install needed packages for the run_qa.py script (datasets module for SQUAD)
+pip install -q -r requirements.txt
+
+perf stat python run_qa.py \
   --model_name_or_path google-bert/bert-base-uncased \
-  --train_file $LUSTRE/HPCTools/LabAI/train-v2.0.json \
-  --validation_file $LUSTRE/HPCTools/LabAI/dev-v2.0.json \
+  --dataset_name rajpurkar/squad \
   --do_train \
   --do_eval \
   --per_device_train_batch_size 12 \
@@ -25,4 +26,4 @@ time python run_qa.py \
   --num_train_epochs 2 \
   --max_seq_length 384 \
   --doc_stride 128 \
-  --output_dir ./baseline_result
+  --output_dir /tmp/debug_squad/
