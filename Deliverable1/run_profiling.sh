@@ -9,7 +9,6 @@
 #SBATCH --time=50:00
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
-#SBATCH --exclusive
 
 #Activate python environment
 source $STORE/mypython/bin/activate
