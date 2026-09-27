@@ -3,3 +3,5 @@
 __pycache__/
 *.pyc
 profiling/
+profiling_v2/
+profiling_v3/

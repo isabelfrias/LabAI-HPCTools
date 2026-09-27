@@ -27,11 +27,10 @@ perf stat python run_qa.py \
   --learning_rate 3e-5 \
   --num_train_epochs 1 \
   --max_seq_length 384 \
-  --max_train_samples 10000 \
+  --max_train_samples 1000 \
   --doc_stride 128 \
-  --output_dir ./profiling_v2/ \
-  --report_to tensorboard \
-  --logging_strategy steps \
-  --logging_steps 50 \
+  --output_dir ./profiling_v3/ \
+  --report_to none \
+  --logging_steps 10 \
   --eval_strategy steps \
   --eval_steps 50 \

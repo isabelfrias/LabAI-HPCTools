@@ -109,10 +109,45 @@ The rest of the file is in charge of a kind of a post-processing of the predicti
 #### utils_qa.py
 
 ### SLURM jobs
+These are the jobs that were executed into Finisterrae 3. First one, its the training job (`run_baseline.sh`) in charge of activate the Python environment, install requirements needed from Hugging face repository (found in `requirements.txt`). Finally, a profiling of the code has been executed with tensorboard, for that purpose a second job is created (`run_profiling.sh`) with only one epoch, as it is enough to find potential bottlenecks.
+
 #### run_baseline.sh
+The training is run with the following hyperparameters: batch_size of 12 examples, learning rate 3x10^5 for Adam optimizer (default optimizer as there is no specific one send in our command), 2 epochs, 384 the number of tokens that BERT can processed at the same time (maximum) and in case of having more than 384 tokens these are splitted in 128 tokens each.
+```python
+perf stat python run_qa.py \
+  --model_name_or_path google-bert/bert-base-uncased \
+  --dataset_name rajpurkar/squad \
+  --do_train \
+  --do_eval \
+  --per_device_train_batch_size 12 \
+  --learning_rate 3e-5 \
+  --num_train_epochs 2 \
+  --max_seq_length 384 \
+  --doc_stride 128 \
+  --output_dir /tmp/debug_squad/
+```
 
 #### run_profiling.sh
-
+Similar to the training one, except the number of epochs and the size of the dataset, we use only 10000 examples and run 1 epoch to make a profiling, in order to not use more resources than necessary to see overall performance. In addition, each 50 steps of the training the metrics are saved into tensorboard's folder data to obtain graphics given by this tool.
+```python
+perf stat python run_qa.py \
+  --model_name_or_path google-bert/bert-base-uncased \
+  --dataset_name rajpurkar/squad \
+  --do_train \
+  --do_eval \
+  --per_device_train_batch_size 12 \
+  --learning_rate 3e-5 \
+  --num_train_epochs 1 \
+  --max_seq_length 384 \
+  --max_train_samples 10000 \
+  --doc_stride 128 \
+  --output_dir ./profiling_v2/ \
+  --report_to tensorboard \
+  --logging_strategy steps \
+  --logging_steps 50 \
+  --eval_strategy steps \
+  --eval_steps 50 \
+```
 
 ### Reporting training times
 

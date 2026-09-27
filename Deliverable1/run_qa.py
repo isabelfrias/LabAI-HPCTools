@@ -44,6 +44,16 @@ from transformers import (
 from transformers.utils import check_min_version
 from transformers.utils.versions import require_version
 
+import torch
+from torch.profiler import profile, ProfilerActivity, schedule, tensorboard_trace_handler
+from transformers import TrainerCallback
+
+class ProfilerCallback(TrainerCallback):
+    def __init__(self, profiler):
+        self.profiler = profiler
+
+    def on_step_end(self, args, state, control, **kwargs):
+        self.profiler.step()
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.57.0.dev0")
@@ -629,7 +639,23 @@ def main():
         checkpoint = None
         if training_args.resume_from_checkpoint is not None:
             checkpoint = training_args.resume_from_checkpoint
+        # Profiler config
+        prof = profile(
+            activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+            schedule=schedule(wait=2, warmup=2, active=5, repeat=1),
+            on_trace_ready=tensorboard_trace_handler(training_args.output_dir + "/tb_profile"),
+            record_shapes=True,
+            profile_memory=True,
+            with_stack=False
+        )
+        
+        prof.start()
+        trainer.add_callback(ProfilerCallback(prof))
+        
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
+        
+        prof.stop()
+        #train_result = trainer.train(resume_from_checkpoint=checkpoint)
         trainer.save_model()  # Saves the tokenizer too for easy upload
 
         metrics = train_result.metrics
