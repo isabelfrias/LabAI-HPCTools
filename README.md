@@ -228,13 +228,13 @@ Tensorboard is also used for hardware profiling. For this analysis, a smaller tr
 The overview confirms the bottle necks identified earlier:
 - Only one worker is used
 - The underutilization of GPU memory
-![alt text](./Tensorboard_images/<Captura de pantalla 2026-09-27 a las 13.01.13-1.png>)
+![alt text](./Tensorboard_images/captura1.png)
 
 The Memory view shows a peak utilization of 4190.7MB, wasting the 246GB available on a A100 node.
-![alt text](./Tensorboard_images/<Captura de pantalla 2026-09-27 a las 13.02.13.png>)
+![alt text](./Tensorboard_images/captura2.png)
 
 This graphic shows Tensor cores are not being utilized because FP32 is used instead of FP16 ((`fp16=False`)). This should be change to actually activate the hardware acceleration and increase the TFLOPS/s.
-![alt text](./Tensorboard_images/<Captura de pantalla 2026-09-27 a las 13.01.54.png>)
+![alt text](./Tensorboard_images/captura3.png)
 
 ### Conclusions
 The combined analysis of executions times, `perf stat`'s output and Tensorboard profile view corroborates the performance bottlenecks present in the baseline.
