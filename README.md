@@ -199,10 +199,10 @@ Training setup:
     - Doc. stride = 128
 
 
-| | Time (min) | Samples/s | achieved TFLOP/s | training loss
-| :--- | :--- | :--- | | :--- |
-| **Training** | 49:06.61 | 60.063 | 10.96 | 0.9787
-| **Evaluation** | 1:03.46 | 169.42 |      |
+| | Time (min) | Samples/s | achieved TFLOP/s | training loss |
+| :--- | :--- | :--- | :--- | :--- |
+| *Training* | 49:06.61 | 60.063 | 10.96 | 0.9787 |
+| *Evaluation* | 1:03.46 | 169.42 | | |
 
 With `perf stat`, the following metrics are obtained:
 ```
