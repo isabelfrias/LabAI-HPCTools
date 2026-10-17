@@ -242,3 +242,9 @@ There are three main critical issues:
 -  GPU Memory underutilization: The configured 12 batch size is insufficient for NVIDIA A100. So the solution must be increase the batch size as much as GPU's RAM allow us in order to process more samples.
 - Sequential operation. Despite requesting 32 cores the training is executed sequentially. This forces GPU to constantly wait for CPU. We must enable parallelism by setting dataloader_num_workers with `run_qa.py` arguments to a higher value. Or maybe reduce the cores allocation to avoid asking for more hardware than neccesary.
 - Tensor cores unused: FP32 is used so the kernel is not utilizing GPU's tensor cores. FP16 must be implmented to activate this specialized hardware and exploit it.
+
+## DISTRIBUTED - Deliverable 2
+| | Time (min) | Samples/s | achieved TFLOP/s | training loss | Samples/gpu | efficiency |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| *Training* | 49:06.61 | 60.063 | 10.96 | 0.9787 | | |
+| *Evaluation* | 1:03.46 | 169.42 | | | | |

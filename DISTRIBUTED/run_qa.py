@@ -45,8 +45,11 @@ from transformers.utils import check_min_version
 from transformers.utils.versions import require_version
 
 import torch
+import torch.distributed as dist
 from torch.profiler import profile, ProfilerActivity, schedule, tensorboard_trace_handler
 from transformers import TrainerCallback
+
+import time
 
 class ProfilerCallback(TrainerCallback):
     def __init__(self, profiler):
@@ -54,6 +57,45 @@ class ProfilerCallback(TrainerCallback):
 
     def on_step_end(self, args, state, control, **kwargs):
         self.profiler.step()
+
+class PerformanceMonitorCallback(TrainerCallback):
+    def __init__(self, warmup_steps=50):
+        self.warmup_steps = warmup_steps
+        self.start_time = None
+        self.total_samples_after_warmup = 0
+
+    def on_step_end(self, args, state, control, **kwargs):
+        if state.global_step == self.warmup_steps:
+            if torch.distributed.is_initialized():
+                torch.distributed.barrier()
+            elif torch.cuda.is_available():
+                torch.cuda.synchronize()
+
+            self.start_time = time.time()
+        if state.global_step > self.warmup_steps:
+            samples_per_step = args.train_batch_size * args.world_size
+            self.total_samples_after_warmup += samples_per_step
+
+    def on_train_end(self, args, state, control, **kwargs):
+        if self.start_time is not None:
+            if torch.distributed.is_initialized():
+                torch.distributed.barrier()
+            elif torch.cuda.is_available():
+                torch.cuda.synchronize()
+
+            total_time = time.time() - self.start_time
+            samples_per_second_total = self.total_samples_after_warmup / total_time
+            samples_per_second_per_gpu = samples_per_second_total / args.world_size
+
+            if args.local_process_index == 0:
+                print("\n--- PERFORMANCE METRICS ---")
+                print(f"Used GPUs (World Size): {args.world_size}")
+                print(f"Total processed samples (excluding warmup): {self.total_samples_after_warmup}")
+                print(f"Measured time (s): {total_time:.2f}")
+                print(f"Total samples/s: {samples_per_second_total:.2f}")
+                print(f"Samples/s/GPU: {samples_per_second_per_gpu:.2f}")
+                print("---------------------------------\n")
+
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.57.0.dev0")
@@ -651,6 +693,7 @@ def main():
         
         prof.start()
         trainer.add_callback(ProfilerCallback(prof))
+        trainer.add_callback(PerformanceMonitorCallback(warmup_steps=50))
         
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
         

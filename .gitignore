@@ -5,3 +5,6 @@ __pycache__/
 profiling/
 profiling_v2/
 profiling_v3/
+DISTRIBUTED/error/
+DISTRIBUTED/logs/
+DISTRIBUTED/lightning_logs/
