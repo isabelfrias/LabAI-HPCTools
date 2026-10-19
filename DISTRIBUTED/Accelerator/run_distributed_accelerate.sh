@@ -7,8 +7,8 @@
 #SBATCH --mem=64G
 #SBATCH --gres=gpu:a100:2
 #SBATCH --time=02:00:00
-#SBATCH --output=logs/%x_%j.out
-#SBATCH --error=error/%x_%j.err
+#SBATCH --output=../logs/%x_%j.out
+#SBATCH --error=../error/%x_%j.err
 
 #Activate python environment
 source $STORE/mypython/bin/activate

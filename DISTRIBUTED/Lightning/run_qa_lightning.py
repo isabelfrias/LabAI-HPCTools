@@ -616,6 +616,7 @@ def main():
 
     # training
     trainer = pl.Trainer(
+        default_root_dir=training_args.output_dir,
         accelerator="gpu", devices=2, num_nodes=1,
         strategy='ddp',
         precision='bf16-mixed',
