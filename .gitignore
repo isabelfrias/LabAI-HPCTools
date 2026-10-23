@@ -1,5 +1,5 @@
-*.out
-*.err
+BASELINE/error/
+BASELINElogs/
 __pycache__/
 *.pyc
 profiling/
@@ -8,3 +8,4 @@ profiling_v3/
 DISTRIBUTED/error/
 DISTRIBUTED/logs/
 DISTRIBUTED/lightning_logs/
+DISTRIBUTED/Lightning/__pycache__/

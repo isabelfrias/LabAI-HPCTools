@@ -1,4 +1,8 @@
 # LabAI-HPCTools
+## Index
+- [BASELINE - Deliverable 1](#baseline---deliverable-1)
+- [DISTRIBUTED - Deliverable 2](#distributed---deliverable-2)
+
 ## BASELINE - Deliverable 1
 ### Key contents
 The baseline implementation is obtained from the following repo: https://github.com/huggingface/transformers/tree/main/examples/pytorch/question-answering
@@ -198,7 +202,7 @@ Training setup:
     - Max sequence length: 384
     - Doc. stride = 128
 
-
+#### Sequential times
 | | Time (min) | Samples/s | achieved TFLOP/s | training loss |
 | :--- | :--- | :--- | :--- | :--- |
 | *Training* | 49:06.61 | 60.063 | 10.96 | 0.9787 |
@@ -244,7 +248,205 @@ There are three main critical issues:
 - Tensor cores unused: FP32 is used so the kernel is not utilizing GPU's tensor cores. FP16 must be implmented to activate this specialized hardware and exploit it.
 
 ## DISTRIBUTED - Deliverable 2
-| | Time (min) | Samples/s | achieved TFLOP/s | training loss | Samples/gpu | efficiency |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| *Training* | 49:06.61 | 60.063 | 10.96 | 0.9787 | | |
-| *Evaluation* | 1:03.46 | 169.42 | | | | |
+For this deliverable, two distributed training implementations have been developed: one utilizing PyTorch Lightning and the other employing Accelerate. Both approaches leverage Distributed Data Parallel (DDP). Given that the model's memory allows it to fit entirely within a single GPU, the training process is being executed across two GPUs located on a single supercomputing node. By referencing the execution times of the sequential baseline [see sequential execution times](#sequential-times), the following performance metrics have been derived for each implementation (e.g., execution time, speedup, and efficiency measures).
+
+### Lightning
+The experiments were conducted on a single computing node equipped with two NVIDIA A100 GPUs and 64 GB of RAM. For the distributed training, PyTorch Lightning was utilized to fine-tune the pre-trained BERT-base-uncased model on the SQuAD dataset. The training phase was executed for two epochs with a per-device batch size of 128, yielding an effective batch size of 256. The optimization process employed a learning rate of 6.399e-4 (it was proportionally scaled by the same factor applied to the batch size, relative to the baseline configuration) and included 100 warmup steps. The maximum sequence length was restricted to 384 tokens with a document stride of 128. To optimize data throughput, the data loaders were configured with 4 workers and pinned memory enabled.
+````
+srun python -u run_qa_lightning.py \
+  --model_name_or_path google-bert/bert-base-uncased \
+  --dataset_name rajpurkar/squad \
+  --do_train \
+  --do_eval \
+  --per_device_train_batch_size 128 \
+  --dataloader_num_workers 4 \
+  --learning_rate 6.399e-4 \
+  --warmup_steps 100 \
+  --dataloader_pin_memory True \
+  --num_train_epochs 2 \
+  --max_seq_length 384 \
+  --doc_stride 128 \
+  --output_dir $STORE/hpctools/results_lightning_$SLURM_JOB_ID
+````
+To comprehensively profile the implementation, both the PyTorch Profiler and the nvidia-smi utility were utilized, with the latter logging hardware metrics directly to a CSV file. 
+```
+nvidia-smi --query-gpu=timestamp,index,name,utilization.gpu,memory.used,memory.total --format=csv -l 5 > gpu_usage_light.csv &
+```
+```
+profiler = PyTorchProfiler(
+        dirpath=training_args.output_dir,
+        filename="tb_profile_lightning",
+        schedule=schedule(wait=2, warmup=2, active=5, repeat=1),
+        activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+        record_shapes=True,
+        profile_memory=True,
+        with_stack=False
+    )
+```
+#### Implementation
+To enable the distributed training implementation, the original QA class was entirely refactored into a PyTorch Lightning module (trainer_qa_lightning.py), incorporating the following methods:
+````
+class QALightning(pl.LightningModule):
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+
+    def training_step(self, train_batch, batch_idx):
+        outputs = self.model(**train_batch)
+        loss = outputs.loss
+        self.log("train_loss", loss)
+        return loss
+
+    def forward(self, batch):
+        return self.model(**batch)
+
+    def configure_optimizers(self):
+        no_decay = ["bias", "LayerNorm.weight"]
+        
+        optimizer_grouped_parameters = [
+            {
+                "params": [
+                    p for n, p in self.model.named_parameters() 
+                    if not any(nd in n for nd in no_decay)
+                ],
+                "weight_decay": 0.01,
+            },
+            {
+                "params": [
+                    p for n, p in self.model.named_parameters() 
+                    if any(nd in n for nd in no_decay)
+                ],
+                "weight_decay": 0.0,
+            },
+        ]
+        optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=3e-5)
+        return optimizer
+
+    def validation_step(self, val_batch, batch_idx):
+        outputs = self.model(**val_batch)
+
+        if outputs.loss is not None:
+            loss = outputs.loss
+            self.log("val_loss", loss, sync_dist=True)
+
+        labels_start = val_batch.get("start_positions")
+        labels_end = val_batch.get("end_positions")
+
+        if labels_start is not None and labels_end is not None:
+            preds_start = torch.argmax(outputs.start_logits, dim=1)
+            preds_end = torch.argmax(outputs.end_logits, dim=1)
+            
+            exact_match = ((preds_start == val_batch["start_positions"]) & 
+                        (preds_end == val_batch["end_positions"])).float().mean()
+            
+            self.log("val_em", exact_match, sync_dist=True)
+
+        return outputs.loss
+````
+Several versions of the new model exhibited overfitting, characterized by an initial decrease in the loss followed by a subsequent increase after a few steps. To mitigate this issue, the optimizer configuration was modified to apply regularization (weight decay) to the model parameters, specifically excluding biases and layer weights from this regularization.
+
+It was also required to integrate two specific callbacks into the training phase: PerformanceMonitorLightning and an early stopping mechanism (early_stop_callback). The former was designed to discard the initial training steps by treating them as a warmup phase, while the latter was implemented to mitigate the overfitting issues observed in previous iterations.
+`````
+class PerformanceMonitorLightning(Callback):
+    def __init__(self, warmup_steps=50):
+        self.warmup_steps = warmup_steps
+        self.start_time = None
+        self.total_samples_after_warmup = 0
+
+    def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
+        if trainer.global_step == self.warmup_steps:
+            trainer.strategy.barrier("warmup_sync")
+            self.start_time = time.time()
+            
+        if trainer.global_step > self.warmup_steps:
+            local_batch_size = len(batch["input_ids"])
+            self.total_samples_after_warmup += local_batch_size * trainer.world_size
+
+    def on_train_end(self, trainer, pl_module):
+        if self.start_time is not None:
+            trainer.strategy.barrier("end_sync")
+            total_time = time.time() - self.start_time
+            
+            samples_per_second_total = self.total_samples_after_warmup / total_time
+            samples_per_second_per_gpu = samples_per_second_total / trainer.world_size
+
+            if trainer.is_global_zero:
+                print("\n--- PERFORMANCE METRICS (LIGHTNING) ---")
+                print(f"Used GPUs (World Size): {trainer.world_size}")
+                print(f"Total processed samples (excluding warmup): {self.total_samples_after_warmup}")
+                print(f"Measured time (s): {total_time:.2f}")
+                print(f"Total samples/s: {samples_per_second_total:.2f}")
+                print(f"Samples/s/GPU: {samples_per_second_per_gpu:.2f}")
+                
+                if "train_loss" in trainer.callback_metrics:
+                    print(f"Final Loss: {trainer.callback_metrics['train_loss']:.4f}")
+                print("---------------------------------------\n")
+`````
+````
+    early_stop_callback = EarlyStopping(
+        monitor='val_loss',
+        min_delta = 0.00,
+        patience=3,
+        verbose=True,
+        mode='min',
+    )
+````
+#### Performance Metrics
+| Phase | GPUs | Time | Samples/s | Samples/GPU | GFLOPS | Speedup | efficiency (MFU) (%) | final loss |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| Training | 2 | 8:20.34 | 328.14 | 164.07 | - | 5.89x | - | 0.8994 |
+| Evaluation | 2 | - | - | - | - | - | - | - |
+
+In terms of execution time, a speedup of 5.89x was achieved. This significant performance gain is attributable not solely to the increased GPU count and the implementation of the DDP strategy, but also to the activation of bf16 mixed precision, which facilitates Tensor Core utilization. Consequently, the processing throughput, measured in samples per second, experienced a nearly fivefold increase.
+
+#### Profiling results
+The TensorBoard profiling reveals an execution dominated by kernel computation, demonstrating a significantly improved step time compared to the baseline. 
+
+![alt text](./DISTRIBUTED/images/Cap1.png)
+
+Enabling bf16 mixed precision activates Tensor Core utilization, reaching 31.7%, a stark contrast to the previous complete lack of utilization of this hardware feature. Furthermore, the Memory View confirms that the CPU is effectively offloading computationally expensive tasks to the GPUs.
+
+![alt text](./DISTRIBUTED/images/Cap2.png)
+
+![alt text](./DISTRIBUTED/images/Cap3.png)
+
+![alt text](./DISTRIBUTED/images/Cap4.png)
+
+
+However, peak memory consumption reaches only 20,884.2 MB (20.88 GB) out of the 40 GB capacity available on the Finisterrae 3 GPUs.
+
+Consequently, while execution times and overall performance have substantially improved, GPU memory utilization could be further maximized by increasing the batch size. Nevertheless, this adjustment introduces the risk of exceeding GPU memory limits (Out-Of-Memory errors), which would necessitate the adoption of alternative distributed training paradigms beyond DDP, such as Fully Sharded Data Parallel (FSDP).
+
+### Accelerate
+#### Experimental setup
+The experimental setup utilized one compute node configured for two concurrent processes, allocating two NVIDIA A100 GPUs managed by Hugging Face Accelerate with the PyTorch Distributed Data Parallel (DDP) backend. Training was executed in Bfloat16 (bf16) mixed precision to accelerate Tensor Core computations, using these launch parameters:
+````
+accelerate launch \
+  --multi_gpu \
+  --num_processes 2 \
+  --num_machines 1 \
+  --mixed_precision bf16 \
+  --dynamo_backend no \
+  run_qa.py \
+  --model_name_or_path google-bert/bert-base-uncased \
+  --dataset_name rajpurkar/squad \
+  --do_train \
+  --do_eval \
+  --bf16 \
+  --per_device_train_batch_size 128 \
+  --dataloader_num_workers 4 \
+  --learning_rate 2e-4 \
+  --warmup_steps 100 \
+  --dataloader_pin_memory True \
+  --num_train_epochs 2 \
+  --max_seq_length 384 \
+  --doc_stride 128 \
+  --output_dir $STORE/hpctools/results_acc_2gpus_$SLURM_JOB_ID
+````
+#### Implementation
+
+####  Performance Metrics
+
+To optimize data throughput, the number of dataloader workers was increased to 4, and the batch size was scaled up to 128 to maximize GPU memory utilization. Consequently, in accordance with the batch size increase from 12 to 128 (256 batch in total), the learning rate was proportionally adjusted by the same factor, scaling from 3e-5 to [new value]."
+
+### Comparing Lightning and Accelerator

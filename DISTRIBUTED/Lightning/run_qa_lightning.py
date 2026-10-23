@@ -28,7 +28,7 @@ from torch.utils.data import DataLoader
 from trainer_qa_lightning import QALightning
 
 import time
-from pytorch_lightning.callbacks import Callback
+from pytorch_lightning.callbacks import Callback, EarlyStopping
 from pytorch_lightning.profilers import PyTorchProfiler
 from torch.profiler import ProfilerActivity, schedule
 
@@ -63,7 +63,6 @@ class PerformanceMonitorLightning(Callback):
                 print(f"Total samples/s: {samples_per_second_total:.2f}")
                 print(f"Samples/s/GPU: {samples_per_second_per_gpu:.2f}")
                 
-                # Extraer el valor final del loss si está registrado
                 if "train_loss" in trainer.callback_metrics:
                     print(f"Final Loss: {trainer.callback_metrics['train_loss']:.4f}")
                 print("---------------------------------------\n")
@@ -614,6 +613,14 @@ def main():
         with_stack=False
     )
 
+    early_stop_callback = EarlyStopping(
+        monitor='val_loss',
+        min_delta = 0.00,
+        patience=3,
+        verbose=True,
+        mode='min',
+    )
+
     # training
     trainer = pl.Trainer(
         default_root_dir=training_args.output_dir,
@@ -621,9 +628,10 @@ def main():
         strategy='ddp',
         precision='bf16-mixed',
         max_epochs=int(training_args.num_train_epochs),
+        val_check_interval=0.25,
         deterministic=True,
-        callbacks=[PerformanceMonitorLightning(warmup_steps=50)], 
-        #profiler=profiler
+        callbacks=[PerformanceMonitorLightning(warmup_steps=50), early_stop_callback], 
+        profiler=profiler
     )
     
     if training_args.do_train:

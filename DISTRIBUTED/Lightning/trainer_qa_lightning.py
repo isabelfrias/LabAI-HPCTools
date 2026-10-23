@@ -16,7 +16,25 @@ class QALightning(pl.LightningModule):
         return self.model(**batch)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=3e-5)
+        no_decay = ["bias", "LayerNorm.weight"]
+        
+        optimizer_grouped_parameters = [
+            {
+                "params": [
+                    p for n, p in self.model.named_parameters() 
+                    if not any(nd in n for nd in no_decay)
+                ],
+                "weight_decay": 0.01,
+            },
+            {
+                "params": [
+                    p for n, p in self.model.named_parameters() 
+                    if any(nd in n for nd in no_decay)
+                ],
+                "weight_decay": 0.0,
+            },
+        ]
+        optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=3e-5)
         return optimizer
 
     def validation_step(self, val_batch, batch_idx):
