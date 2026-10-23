@@ -1,9 +1,0 @@
-slurmstepd: info: Setting TMPDIR to /scratch/9902062. Previous errors about TMPDIR can be discarded
-Traceback (most recent call last):
-  File "/mnt/lustre/scratch/nlsas/home/ulc/cursos/curso358/HPCTools/LabAI/run_qa.py", line 26, in <module>
-    import datasets
-ModuleNotFoundError: No module named 'datasets'
-
-real	0m0.125s
-user	0m0.037s
-sys	0m0.010s
