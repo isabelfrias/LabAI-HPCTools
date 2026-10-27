@@ -486,7 +486,7 @@ The profiling analysis indicates that GPU utilization remains low with this curr
 
 - Accelerate: Exhibits a pronounced CPU-bound bottleneck, with CPU execution accounting for 27.05% of the total runtime. Consequently, the GPU suffers from extensive idle time awaiting data, leading to low multiprocessor efficiency (37.83%) and a suboptimal Model FLOPs Utilization (MFU) of 8.19%. Moreover, attempting to scale the batch size to 128 to maximize GPU saturation exposed a sharp trade-off between computational throughput and model accuracy: training loss degraded significantly to 1.4286, and scaling the learning rate induced instability within the optimizer. To preserve task performance (F1 score and Exact Match), computational efficiency was intentionally compromised by reducing the batch size to 16, ultimately resulting in a higher final loss (1.1081) compared to Lightning.
 
-### Conclusion
+### Conclusion
 
 In conclusion, PyTorch Lightning delivers superior computational performance and model optimization at the cost of requiring a substantial code refactoring into its high-level abstractions. Conversely, Accelerate provides a low-friction, native integration path; however, it remains severely constrained by convergence instabilities when scaling the batch size, leading to hardware underutilization and significant CPU bottlenecks.
 
