@@ -6,7 +6,7 @@
 #SBATCH --cpus-per-task=64
 #SBATCH --mem=64G
 #SBATCH --gres=gpu:a100:2
-#SBATCH --time=01:00:00
+#SBATCH --time=00:30:00
 #SBATCH --output=../logs/%x_%j.out
 #SBATCH --error=../error/%x_%j.err
 
@@ -32,14 +32,15 @@ accelerate launch \
   --do_train \
   --do_eval \
   --bf16 \
-  --per_device_train_batch_size 128 \
+  --per_device_train_batch_size 16 \
   --dataloader_num_workers 4 \
-  --learning_rate 6.399e-4 \
-  --warmup_steps 100 \
+  --learning_rate 5e-5 \
+  --warmup_steps 500 \
+  --weight_decay 0.01 \
   --dataloader_pin_memory True \
   --num_train_epochs 2 \
   --max_seq_length 384 \
   --doc_stride 128 \
-  --max_grad_norm 0.5 \
-  --logging_steps 20 \
+  --max_grad_norm 1.0 \
+  --logging_steps 50 \
   --output_dir $STORE/hpctools/results_acc_2gpus_$SLURM_JOB_ID

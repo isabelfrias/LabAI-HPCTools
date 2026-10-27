@@ -272,7 +272,7 @@ To comprehensively profile the implementation, both the PyTorch Profiler and the
 ```
 nvidia-smi --query-gpu=timestamp,index,name,utilization.gpu,memory.used,memory.total --format=csv -l 5 > gpu_usage_light.csv &
 ```
-```
+```python
 profiler = PyTorchProfiler(
         dirpath=training_args.output_dir,
         filename="tb_profile_lightning",
@@ -285,7 +285,7 @@ profiler = PyTorchProfiler(
 ```
 #### Implementation
 To enable the distributed training implementation, the original QA class was entirely refactored into a PyTorch Lightning module (trainer_qa_lightning.py), incorporating the following methods:
-````
+````python
 class QALightning(pl.LightningModule):
     def __init__(self, model):
         super().__init__()
@@ -346,7 +346,7 @@ class QALightning(pl.LightningModule):
 Several versions of the new model exhibited overfitting, characterized by an initial decrease in the loss followed by a subsequent increase after a few steps. To mitigate this issue, the optimizer configuration was modified to apply regularization (weight decay) to the model parameters, specifically excluding biases and layer weights from this regularization.
 
 It was also required to integrate two specific callbacks into the training phase: PerformanceMonitorLightning and an early stopping mechanism (early_stop_callback). The former was designed to discard the initial training steps by treating them as a warmup phase, while the latter was implemented to mitigate the overfitting issues observed in previous iterations.
-`````
+`````python
 class PerformanceMonitorLightning(Callback):
     def __init__(self, warmup_steps=50):
         self.warmup_steps = warmup_steps
@@ -392,7 +392,7 @@ class PerformanceMonitorLightning(Callback):
     )
 ````
 #### Performance Metrics
-| Phase | GPUs | Time | Samples/s | Samples/GPU | GFLOPS | Speedup | efficiency (MFU) (%) | final loss |
+| Phase | GPUs | Time (min) | Samples/s | Samples/GPU | GFLOPS | Speedup | efficiency (MFU) (%) | final loss |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | Training | 2 | 8:20.34 | 328.14 | 164.07 | - | 5.89x | - | 0.8994 |
 | Evaluation | 2 | - | - | - | - | - | - | - |
@@ -433,20 +433,60 @@ accelerate launch \
   --do_train \
   --do_eval \
   --bf16 \
-  --per_device_train_batch_size 128 \
+  --per_device_train_batch_size 16 \
   --dataloader_num_workers 4 \
-  --learning_rate 2e-4 \
-  --warmup_steps 100 \
+  --learning_rate 5e-5 \
+  --warmup_steps 500 \
+  --weight_decay 0.01 \
   --dataloader_pin_memory True \
   --num_train_epochs 2 \
   --max_seq_length 384 \
   --doc_stride 128 \
+  --max_grad_norm 1.0 \
+  --logging_steps 50 \
   --output_dir $STORE/hpctools/results_acc_2gpus_$SLURM_JOB_ID
 ````
+To comprehensively profile the implementation, both the PyTorch Profiler and the nvidia-smi utility were utilized again, with the latter logging hardware metrics directly to a CSV file. 
+```
+nvidia-smi --query-gpu=timestamp,index,name,utilization.gpu,memory.used,memory.total --format=csv -l 5 > gpu_usage_acc.csv &
+```
+````python
+# Profiler config
+        prof = profile(
+            activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+            schedule=schedule(wait=2, warmup=2, active=5, repeat=1),
+            on_trace_ready=tensorboard_trace_handler(training_args.output_dir + "/tb_profile"),
+            record_shapes=True,
+            profile_memory=True,
+            with_stack=False
+        )
+````
 #### Implementation
+To optimize data throughput, the number of dataloader workers was increased to 4, and the batch size was scaled up to 16 to maximize GPU memory utilization. Consequently, in accordance with the batch size increase from 12 to 16 (batch in total), the learning rate was proportionally adjusted by the same factor, scaling from 3e-5 to 5e-5. 
+
+During the fine-tuning, for a fixed duration of two epochs, an initial degradation in the training loss (train_loss) was observed when scaling up the batch size. This behavior stem from the inherent structural trade-off between effective batch size and weight update frequency. Specifically, increasing the batch size intrinsically reduces the total number of optimization steps per epoch. Consequently, experiments utilizing an effective batch size of 128 (64 per GPU) yielded a training loss of 1.4286, which was substantially higher than the baseline value of 0.9787. Furthermore, attempting to compensate for this by scaling the learning rate introduced convergence instability within the AdamW optimizer. Therefore, a batch size of 16 was ultimately selected, as it provided the optimal equilibrium between computational throughput (HPC performance) and task-specific evaluation metrics, namely F1 score and Exact Match (EM) from a machine learning point of view.
+
+This implementation natively supports both Accelerate and distributed training paradigms by inheriting directly from the Hugging Face Trainer class. It effectively leverages internal properties such as world_size for global batch size calculations, as well as the should_save and should_log flags to prevent race conditions and inter-process conflicts. Consequently, this architecture ensures seamless compatibility and can be executed directly via the accelerate launch command.
 
 ####  Performance Metrics
+| Phase | GPUs | Time (min) | Samples/s | Samples/GPU | GFLOPS | Speedup | efficiency (MFU) (%) | final loss |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| Training | 2 |10:31.89 | 280.084 | 140.042 | 32309300 | 4,66x| 8.19 | 1.1081 |
+| Evaluation | 2 | 00:10.52 | 1021.721 | 510,8605 | - | 6,03x | - | - |
 
-To optimize data throughput, the number of dataloader workers was increased to 4, and the batch size was scaled up to 128 to maximize GPU memory utilization. Consequently, in accordance with the batch size increase from 12 to 128 (256 batch in total), the learning rate was proportionally adjusted by the same factor, scaling from 3e-5 to [new value]."
+For this implementation, execution time improvements were similarly driven by the factors identified in the Lightning setup, namely the increased batch size and the activation of bf16 mixed precision. However, a Model Flops Utilization (MFU) below 10% indicates that the code remains suboptimal in terms of hardware efficiency. Target values typically range between 20% and 40%—as addressed during coursework—or even exceed 40% in highly optimized distributed environments.
+
+#### Profiling results
+![alt text](./DISTRIBUTED/images/Cap5.png)
+
+The profiling analysis indicates that GPU utilization remains low with this current batch size configuration, operating at 49.86% capacity with a multiprocessor efficiency of 37.83%. CPU execution (CPU Exec) accounts for 27.05% of the total runtime, pointing to a bottleneck where the GPU experiences idle time while awaiting CPU task processing. In fact, the profiler itself explicitly recommends increasing the batch size, a modification that was ultimately constrained due to the aforementioned training loss degradation.
 
 ### Comparing Lightning and Accelerator
+PyTorch Lightning: Demonstrates significantly higher execution speed, achieving nearly a 20% increase in sample throughput (samples/sec). By accommodating a substantially larger per-GPU batch size (128), GPU memory saturation is optimized. Furthermore, the framework successfully mitigated the initial overfitting through weight decay regularization and an early stopping mechanism. This enabled the deployment of a large batch size (128) while preserving strong convergence stability and achieving an optimal final loss of 0.8994.
+
+Accelerate: Exhibits a pronounced CPU-bound bottleneck, with CPU execution accounting for 27.05% of the total runtime. Consequently, the GPU suffers from extensive idle time awaiting data, leading to low multiprocessor efficiency (37.83%) and a suboptimal Model FLOPs Utilization (MFU) of 8.19%. Moreover, attempting to scale the batch size to 128 to maximize GPU saturation exposed a sharp trade-off between computational throughput and model accuracy: training loss degraded significantly to 1.4286, and scaling the learning rate induced instability within the optimizer. To preserve task performance (F1 score and Exact Match), computational efficiency was intentionally compromised by reducing the batch size to 16, ultimately resulting in a higher final loss (1.1081) compared to Lightning.
+
+### Conclusion
+In conclusion, PyTorch Lightning delivers superior computational performance and model optimization at the cost of requiring a substantial code refactoring into its high-level abstractions. Conversely, Accelerate provides a low-friction, native integration path; however, it remains severely constrained by convergence instabilities when scaling the batch size, leading to hardware underutilization and significant CPU bottlenecks.
+
+To address the limitations observed in the Accelerate implementation, a viable optimization strategy would be to further refine the hyperparameter schedule—specifically tuning the learning rate and warmup steps—to stabilize training at higher batch sizes. Should convergence issues persist despite these adjustments, transitioning to an alternative optimization algorithm (such as LARS or LAMB, which are explicitly designed for large-batch regime stability) would represent the next logical step."

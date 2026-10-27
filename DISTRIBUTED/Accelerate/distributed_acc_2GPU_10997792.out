@@ -1,0 +1,263 @@
+slurmstepd: info: Setting TMPDIR to /scratch/10997792. Previous errors about TMPDIR can be discarded
+10/26/2026 16:27:54 - WARNING - __main__ - Process rank: 0, device: cuda:0, n_gpu: 1, distributed training: True, 16-bits training: False
+10/26/2026 16:27:54 - INFO - __main__ - Training/evaluation parameters TrainingArguments(
+accelerator_config={'split_batches': False, 'dispatch_batches': None, 'even_batches': True, 'use_seedable_sampler': True, 'non_blocking': False, 'gradient_accumulation_kwargs': None, 'use_configured_state': False},
+adam_beta1=0.9,
+adam_beta2=0.999,
+adam_epsilon=1e-08,
+auto_find_batch_size=False,
+average_tokens_across_devices=True,
+batch_eval_metrics=False,
+bf16=True,
+bf16_full_eval=False,
+data_seed=None,
+dataloader_drop_last=False,
+dataloader_in_order=True,
+dataloader_multiprocessing_context=None,
+dataloader_num_workers=4,
+dataloader_persistent_workers=False,
+dataloader_pin_memory=True,
+dataloader_prefetch_factor=None,
+ddp_backend=None,
+ddp_broadcast_buffers=None,
+ddp_bucket_cap_mb=None,
+ddp_find_unused_parameters=None,
+ddp_static_graph=None,
+ddp_timeout=1800,
+debug=[],
+deepspeed=None,
+disable_tqdm=False,
+do_eval=True,
+do_predict=False,
+do_train=True,
+enable_jit_checkpoint=False,
+eval_accumulation_steps=None,
+eval_delay=0,
+eval_do_concat_batches=True,
+eval_on_start=False,
+eval_steps=None,
+eval_strategy=no,
+eval_use_gather_object=False,
+fp16=False,
+fp16_full_eval=False,
+fsdp=None,
+fsdp_config=None,
+full_determinism=False,
+gradient_accumulation_steps=1,
+gradient_checkpointing=False,
+gradient_checkpointing_kwargs=None,
+greater_is_better=None,
+hub_always_push=False,
+hub_model_id=None,
+hub_private_repo=None,
+hub_revision=None,
+hub_strategy=every_save,
+hub_token=<HUB_TOKEN>,
+ignore_data_skip=False,
+include_for_metrics=[],
+include_num_input_tokens_seen=no,
+label_names=None,
+label_smoothing_factor=0.0,
+learning_rate=5e-05,
+length_column_name=length,
+liger_kernel_config=None,
+load_best_model_at_end=False,
+local_rank=-1,
+log_level=passive,
+log_level_replica=warning,
+log_on_each_node=True,
+logging_first_step=False,
+logging_nan_inf_filter=True,
+logging_steps=50,
+logging_strategy=steps,
+lr_scheduler_kwargs=None,
+lr_scheduler_type=linear,
+max_grad_norm=1.0,
+max_steps=-1,
+metric_for_best_model=None,
+neftune_noise_alpha=None,
+num_train_epochs=2.0,
+optim=adamw_torch,
+optim_args=None,
+optim_target_modules=None,
+output_dir=/mnt/netapp2/Store_uni//home/ulc/cursos/curso358/hpctools/results_acc_2gpus_10997792,
+parallelism_config=None,
+per_device_eval_batch_size=8,
+per_device_train_batch_size=16,
+prediction_loss_only=False,
+project=huggingface,
+push_to_hub=False,
+remove_unused_columns=True,
+report_to=[],
+restore_callback_states_from_checkpoint=False,
+resume_from_checkpoint=None,
+run_name=None,
+save_on_each_node=False,
+save_only_model=False,
+save_steps=500,
+save_strategy=steps,
+save_total_limit=None,
+seed=42,
+skip_memory_metrics=True,
+tf32=None,
+torch_compile=False,
+torch_compile_backend=None,
+torch_compile_mode=None,
+torch_empty_cache_steps=None,
+trackio_bucket_id=None,
+trackio_space_id=None,
+trackio_static_space_id=None,
+train_sampling_strategy=random,
+use_cache=False,
+use_cpu=False,
+use_liger_kernel=False,
+warmup_steps=500.0,
+weight_decay=0.01,
+)
+10/26/2026 16:27:54 - WARNING - __main__ - Process rank: 1, device: cuda:1, n_gpu: 1, distributed training: True, 16-bits training: False
+10/26/2026 16:27:55 - WARNING - huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+10/26/2026 16:27:56 - WARNING - huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+10/26/2026 16:27:56 - INFO - datasets.builder - Found cached dataset squad (/mnt/netapp2/Store_uni/home/ulc/cursos/curso358/hf_cache/datasets/rajpurkar___squad/plain_text/0.0.0/7b6d24c440a36b6815f21b70d25016731768db1f)
+10/26/2026 16:28:08 - INFO - datasets.arrow_dataset - Loading cached processed dataset at /mnt/netapp2/Store_uni/home/ulc/cursos/curso358/hf_cache/datasets/rajpurkar___squad/plain_text/0.0.0/7b6d24c440a36b6815f21b70d25016731768db1f/cache-2c5915b4fd6ed71b_*_of_00001.arrow
+10/26/2026 16:28:11 - INFO - datasets.arrow_dataset - Loading cached processed dataset at /mnt/netapp2/Store_uni/home/ulc/cursos/curso358/hf_cache/datasets/rajpurkar___squad/plain_text/0.0.0/7b6d24c440a36b6815f21b70d25016731768db1f/cache-b20056b79538d5cd_*_of_00001.arrow
+10/26/2026 16:28:12 - WARNING - accelerate.utils.other - [RANK 0] Detected kernel version 4.18.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+{'loss': '5.761', 'grad_norm': '5.664', 'learning_rate': '4.9e-06', 'epoch': '0.01808'}
+{'loss': '4.763', 'grad_norm': '4.299', 'learning_rate': '9.9e-06', 'epoch': '0.03615'}
+{'loss': '3.724', 'grad_norm': '16.33', 'learning_rate': '1.49e-05', 'epoch': '0.05423'}
+{'loss': '2.722', 'grad_norm': '11.6', 'learning_rate': '1.99e-05', 'epoch': '0.07231'}
+{'loss': '2.4', 'grad_norm': '13.96', 'learning_rate': '2.49e-05', 'epoch': '0.09038'}
+{'loss': '2.226', 'grad_norm': '16.58', 'learning_rate': '2.99e-05', 'epoch': '0.1085'}
+{'loss': '1.991', 'grad_norm': '13.02', 'learning_rate': '3.49e-05', 'epoch': '0.1265'}
+{'loss': '1.774', 'grad_norm': '12.75', 'learning_rate': '3.99e-05', 'epoch': '0.1446'}
+{'loss': '1.59', 'grad_norm': '18.09', 'learning_rate': '4.49e-05', 'epoch': '0.1627'}
+{'loss': '1.618', 'grad_norm': '11.08', 'learning_rate': '4.99e-05', 'epoch': '0.1808'}
+{'loss': '1.541', 'grad_norm': '16.79', 'learning_rate': '4.951e-05', 'epoch': '0.1988'}
+{'loss': '1.468', 'grad_norm': '11.28', 'learning_rate': '4.902e-05', 'epoch': '0.2169'}
+{'loss': '1.408', 'grad_norm': '14.1', 'learning_rate': '4.852e-05', 'epoch': '0.235'}
+{'loss': '1.394', 'grad_norm': '11.73', 'learning_rate': '4.802e-05', 'epoch': '0.2531'}
+{'loss': '1.314', 'grad_norm': '11.91', 'learning_rate': '4.753e-05', 'epoch': '0.2711'}
+{'loss': '1.348', 'grad_norm': '9.489', 'learning_rate': '4.703e-05', 'epoch': '0.2892'}
+{'loss': '1.304', 'grad_norm': '14.2', 'learning_rate': '4.653e-05', 'epoch': '0.3073'}
+{'loss': '1.275', 'grad_norm': '11.7', 'learning_rate': '4.604e-05', 'epoch': '0.3254'}
+{'loss': '1.342', 'grad_norm': '14.35', 'learning_rate': '4.554e-05', 'epoch': '0.3435'}
+{'loss': '1.33', 'grad_norm': '11.61', 'learning_rate': '4.504e-05', 'epoch': '0.3615'}
+{'loss': '1.264', 'grad_norm': '11.63', 'learning_rate': '4.454e-05', 'epoch': '0.3796'}
+{'loss': '1.285', 'grad_norm': '9.436', 'learning_rate': '4.405e-05', 'epoch': '0.3977'}
+{'loss': '1.263', 'grad_norm': '7.836', 'learning_rate': '4.355e-05', 'epoch': '0.4158'}
+{'loss': '1.248', 'grad_norm': '9.964', 'learning_rate': '4.305e-05', 'epoch': '0.4338'}
+{'loss': '1.258', 'grad_norm': '8.641', 'learning_rate': '4.256e-05', 'epoch': '0.4519'}
+{'loss': '1.166', 'grad_norm': '10.36', 'learning_rate': '4.206e-05', 'epoch': '0.47'}
+{'loss': '1.21', 'grad_norm': '10.94', 'learning_rate': '4.156e-05', 'epoch': '0.4881'}
+{'loss': '1.261', 'grad_norm': '12.35', 'learning_rate': '4.107e-05', 'epoch': '0.5061'}
+{'loss': '1.172', 'grad_norm': '10.8', 'learning_rate': '4.057e-05', 'epoch': '0.5242'}
+{'loss': '1.167', 'grad_norm': '8.998', 'learning_rate': '4.007e-05', 'epoch': '0.5423'}
+{'loss': '1.124', 'grad_norm': '14.01', 'learning_rate': '3.958e-05', 'epoch': '0.5604'}
+{'loss': '1.153', 'grad_norm': '9.044', 'learning_rate': '3.908e-05', 'epoch': '0.5785'}
+{'loss': '1.136', 'grad_norm': '10.32', 'learning_rate': '3.858e-05', 'epoch': '0.5965'}
+{'loss': '1.099', 'grad_norm': '11.15', 'learning_rate': '3.809e-05', 'epoch': '0.6146'}
+{'loss': '1.096', 'grad_norm': '11.72', 'learning_rate': '3.759e-05', 'epoch': '0.6327'}
+{'loss': '1.1', 'grad_norm': '10.29', 'learning_rate': '3.709e-05', 'epoch': '0.6508'}
+{'loss': '1.109', 'grad_norm': '9.21', 'learning_rate': '3.66e-05', 'epoch': '0.6688'}
+{'loss': '1.184', 'grad_norm': '8.129', 'learning_rate': '3.61e-05', 'epoch': '0.6869'}
+{'loss': '1.146', 'grad_norm': '14.08', 'learning_rate': '3.56e-05', 'epoch': '0.705'}
+{'loss': '1.116', 'grad_norm': '9.673', 'learning_rate': '3.511e-05', 'epoch': '0.7231'}
+{'loss': '1.114', 'grad_norm': '6.448', 'learning_rate': '3.461e-05', 'epoch': '0.7411'}
+{'loss': '1.12', 'grad_norm': '7.599', 'learning_rate': '3.411e-05', 'epoch': '0.7592'}
+{'loss': '1.099', 'grad_norm': '12.32', 'learning_rate': '3.361e-05', 'epoch': '0.7773'}
+{'loss': '1.064', 'grad_norm': '9.21', 'learning_rate': '3.312e-05', 'epoch': '0.7954'}
+{'loss': '1.017', 'grad_norm': '7.893', 'learning_rate': '3.262e-05', 'epoch': '0.8134'}
+{'loss': '1.038', 'grad_norm': '8.596', 'learning_rate': '3.212e-05', 'epoch': '0.8315'}
+{'loss': '1.071', 'grad_norm': '9.604', 'learning_rate': '3.163e-05', 'epoch': '0.8496'}
+{'loss': '1.076', 'grad_norm': '8.498', 'learning_rate': '3.113e-05', 'epoch': '0.8677'}
+{'loss': '1.045', 'grad_norm': '7.684', 'learning_rate': '3.063e-05', 'epoch': '0.8858'}
+{'loss': '1.098', 'grad_norm': '11.23', 'learning_rate': '3.014e-05', 'epoch': '0.9038'}
+{'loss': '1.05', 'grad_norm': '8.25', 'learning_rate': '2.964e-05', 'epoch': '0.9219'}
+{'loss': '0.986', 'grad_norm': '11.76', 'learning_rate': '2.914e-05', 'epoch': '0.94'}
+{'loss': '1.033', 'grad_norm': '10.41', 'learning_rate': '2.865e-05', 'epoch': '0.9581'}
+{'loss': '1.044', 'grad_norm': '9.249', 'learning_rate': '2.815e-05', 'epoch': '0.9761'}
+{'loss': '1.045', 'grad_norm': '8.979', 'learning_rate': '2.765e-05', 'epoch': '0.9942'}
+{'loss': '0.8549', 'grad_norm': '12.89', 'learning_rate': '2.716e-05', 'epoch': '1.012'}
+{'loss': '0.7047', 'grad_norm': '8.939', 'learning_rate': '2.666e-05', 'epoch': '1.03'}
+{'loss': '0.7273', 'grad_norm': '10.44', 'learning_rate': '2.616e-05', 'epoch': '1.048'}
+{'loss': '0.7415', 'grad_norm': '4.296', 'learning_rate': '2.567e-05', 'epoch': '1.067'}
+{'loss': '0.7407', 'grad_norm': '12.75', 'learning_rate': '2.517e-05', 'epoch': '1.085'}
+{'loss': '0.7913', 'grad_norm': '8.582', 'learning_rate': '2.467e-05', 'epoch': '1.103'}
+{'loss': '0.7944', 'grad_norm': '11.99', 'learning_rate': '2.418e-05', 'epoch': '1.121'}
+{'loss': '0.7492', 'grad_norm': '9.442', 'learning_rate': '2.368e-05', 'epoch': '1.139'}
+{'loss': '0.7304', 'grad_norm': '9.999', 'learning_rate': '2.318e-05', 'epoch': '1.157'}
+{'loss': '0.7493', 'grad_norm': '5.099', 'learning_rate': '2.268e-05', 'epoch': '1.175'}
+{'loss': '0.7363', 'grad_norm': '8.549', 'learning_rate': '2.219e-05', 'epoch': '1.193'}
+{'loss': '0.7578', 'grad_norm': '7.837', 'learning_rate': '2.169e-05', 'epoch': '1.211'}
+{'loss': '0.7696', 'grad_norm': '12.3', 'learning_rate': '2.119e-05', 'epoch': '1.229'}
+{'loss': '0.7737', 'grad_norm': '8.676', 'learning_rate': '2.07e-05', 'epoch': '1.247'}
+{'loss': '0.7116', 'grad_norm': '8.231', 'learning_rate': '2.02e-05', 'epoch': '1.265'}
+{'loss': '0.7539', 'grad_norm': '8.963', 'learning_rate': '1.97e-05', 'epoch': '1.283'}
+{'loss': '0.7775', 'grad_norm': '6.465', 'learning_rate': '1.921e-05', 'epoch': '1.302'}
+{'loss': '0.7471', 'grad_norm': '10.83', 'learning_rate': '1.871e-05', 'epoch': '1.32'}
+{'loss': '0.761', 'grad_norm': '8.907', 'learning_rate': '1.821e-05', 'epoch': '1.338'}
+{'loss': '0.7462', 'grad_norm': '7.124', 'learning_rate': '1.772e-05', 'epoch': '1.356'}
+{'loss': '0.7218', 'grad_norm': '5.99', 'learning_rate': '1.722e-05', 'epoch': '1.374'}
+{'loss': '0.7142', 'grad_norm': '5.689', 'learning_rate': '1.672e-05', 'epoch': '1.392'}
+{'loss': '0.7576', 'grad_norm': '9.631', 'learning_rate': '1.623e-05', 'epoch': '1.41'}
+{'loss': '0.7658', 'grad_norm': '8.573', 'learning_rate': '1.573e-05', 'epoch': '1.428'}
+{'loss': '0.7219', 'grad_norm': '9.47', 'learning_rate': '1.523e-05', 'epoch': '1.446'}
+{'loss': '0.7452', 'grad_norm': '10.91', 'learning_rate': '1.474e-05', 'epoch': '1.464'}
+{'loss': '0.7661', 'grad_norm': '12.79', 'learning_rate': '1.424e-05', 'epoch': '1.482'}
+{'loss': '0.7579', 'grad_norm': '7.511', 'learning_rate': '1.374e-05', 'epoch': '1.5'}
+{'loss': '0.7525', 'grad_norm': '13.52', 'learning_rate': '1.325e-05', 'epoch': '1.518'}
+{'loss': '0.6992', 'grad_norm': '9.91', 'learning_rate': '1.275e-05', 'epoch': '1.537'}
+{'loss': '0.7463', 'grad_norm': '8.315', 'learning_rate': '1.225e-05', 'epoch': '1.555'}
+{'loss': '0.7399', 'grad_norm': '14.47', 'learning_rate': '1.175e-05', 'epoch': '1.573'}
+{'loss': '0.7384', 'grad_norm': '11.49', 'learning_rate': '1.126e-05', 'epoch': '1.591'}
+{'loss': '0.707', 'grad_norm': '10.86', 'learning_rate': '1.076e-05', 'epoch': '1.609'}
+{'loss': '0.7035', 'grad_norm': '9.198', 'learning_rate': '1.026e-05', 'epoch': '1.627'}
+{'loss': '0.7294', 'grad_norm': '12.72', 'learning_rate': '9.767e-06', 'epoch': '1.645'}
+{'loss': '0.7894', 'grad_norm': '10.53', 'learning_rate': '9.271e-06', 'epoch': '1.663'}
+{'loss': '0.708', 'grad_norm': '8.746', 'learning_rate': '8.774e-06', 'epoch': '1.681'}
+{'loss': '0.6879', 'grad_norm': '10.81', 'learning_rate': '8.277e-06', 'epoch': '1.699'}
+{'loss': '0.7139', 'grad_norm': '9.548', 'learning_rate': '7.78e-06', 'epoch': '1.717'}
+{'loss': '0.6842', 'grad_norm': '9.962', 'learning_rate': '7.283e-06', 'epoch': '1.735'}
+{'loss': '0.7309', 'grad_norm': '8.872', 'learning_rate': '6.787e-06', 'epoch': '1.753'}
+{'loss': '0.7087', 'grad_norm': '12.2', 'learning_rate': '6.29e-06', 'epoch': '1.772'}
+{'loss': '0.7549', 'grad_norm': '8.681', 'learning_rate': '5.793e-06', 'epoch': '1.79'}
+{'loss': '0.7294', 'grad_norm': '11.16', 'learning_rate': '5.296e-06', 'epoch': '1.808'}
+{'loss': '0.6381', 'grad_norm': '7.486', 'learning_rate': '4.799e-06', 'epoch': '1.826'}
+{'loss': '0.7181', 'grad_norm': '16.53', 'learning_rate': '4.302e-06', 'epoch': '1.844'}
+{'loss': '0.7445', 'grad_norm': '9.718', 'learning_rate': '3.806e-06', 'epoch': '1.862'}
+{'loss': '0.7134', 'grad_norm': '11.45', 'learning_rate': '3.309e-06', 'epoch': '1.88'}
+{'loss': '0.6598', 'grad_norm': '9.986', 'learning_rate': '2.812e-06', 'epoch': '1.898'}
+{'loss': '0.7398', 'grad_norm': '8.075', 'learning_rate': '2.315e-06', 'epoch': '1.916'}
+{'loss': '0.6946', 'grad_norm': '8.687', 'learning_rate': '1.818e-06', 'epoch': '1.934'}
+{'loss': '0.7382', 'grad_norm': '8.452', 'learning_rate': '1.322e-06', 'epoch': '1.952'}
+{'loss': '0.6816', 'grad_norm': '8.706', 'learning_rate': '8.247e-07', 'epoch': '1.97'}
+{'loss': '0.6746', 'grad_norm': '6.863', 'learning_rate': '3.279e-07', 'epoch': '1.988'}
+{'train_runtime': '631.9', 'train_samples_per_second': '280.1', 'train_steps_per_second': '8.755', 'train_loss': '1.108', 'epoch': '2'}
+
+--- PERFORMANCE METRICS ---
+Used GPUs (World Size): 2
+Total processed samples (excluding warmup): 175424
+Measured time (s): 606.46
+Total samples/s: 289.26
+Samples/s/GPU: 144.63
+---------------------------------
+
+***** train metrics *****
+  epoch                    =        2.0
+  total_flos               = 32309300GF
+  train_loss               =     1.1081
+  train_runtime            = 0:10:31.89
+  train_samples            =      88492
+  train_samples_per_second =    280.084
+  train_steps_per_second   =      8.755
+10/26/2026 16:39:13 - INFO - __main__ - *** Evaluate ***
+10/26/2026 16:39:26 - INFO - utils_qa - Post-processing 10570 example predictions split into 10753 features.
+10/26/2026 16:39:34 - INFO - utils_qa - Saving predictions to /mnt/netapp2/Store_uni//home/ulc/cursos/curso358/hpctools/results_acc_2gpus_10997792/eval_predictions.json.
+10/26/2026 16:39:34 - INFO - utils_qa - Saving nbest_preds to /mnt/netapp2/Store_uni//home/ulc/cursos/curso358/hpctools/results_acc_2gpus_10997792/eval_nbest_predictions.json.
+***** eval metrics *****
+  epoch                   =        2.0
+  eval_exact_match        =     81.334
+  eval_f1                 =    88.4109
+  eval_runtime            = 0:00:10.52
+  eval_samples            =      10753
+  eval_samples_per_second =   1021.721
+  eval_steps_per_second   =     63.947
