@@ -1,6 +1,6 @@
-slurmstepd: info: Setting TMPDIR to /scratch/10918155. Previous errors about TMPDIR can be discarded
-10/22/2026 18:42:46 - WARNING - __main__ - Process rank: 0, device: cuda:0, n_gpu: 2, distributed training: False, 16-bits training: False
-10/22/2026 18:42:46 - INFO - __main__ - Training/evaluation parameters TrainingArguments(
+slurmstepd: info: Setting TMPDIR to /scratch/11053157. Previous errors about TMPDIR can be discarded
+10/28/2026 11:53:55 - WARNING - __main__ - Process rank: 0, device: cuda:0, n_gpu: 2, distributed training: False, 16-bits training: False
+10/28/2026 11:53:55 - INFO - __main__ - Training/evaluation parameters TrainingArguments(
 accelerator_config={'split_batches': False, 'dispatch_batches': None, 'even_batches': True, 'use_seedable_sampler': True, 'non_blocking': False, 'gradient_accumulation_kwargs': None, 'use_configured_state': False},
 adam_beta1=0.9,
 adam_beta2=0.999,
@@ -80,7 +80,7 @@ num_train_epochs=2.0,
 optim=adamw_torch,
 optim_args=None,
 optim_target_modules=None,
-output_dir=/mnt/netapp2/Store_uni//home/ulc/cursos/curso358/hpctools/results_lightning_10918155,
+output_dir=/mnt/netapp2/Store_uni//home/ulc/cursos/curso358/hpctools/results_lightning_11053157,
 parallelism_config=None,
 per_device_eval_batch_size=8,
 per_device_train_batch_size=128,
@@ -111,11 +111,11 @@ train_sampling_strategy=random,
 use_cache=False,
 use_cpu=False,
 use_liger_kernel=False,
-warmup_steps=100.0,
+warmup_steps=50.0,
 weight_decay=0.0,
 )
-10/22/2026 18:42:46 - WARNING - __main__ - Process rank: 0, device: cuda:0, n_gpu: 2, distributed training: False, 16-bits training: False
-10/22/2026 18:42:46 - INFO - __main__ - Training/evaluation parameters TrainingArguments(
+10/28/2026 11:53:55 - WARNING - __main__ - Process rank: 0, device: cuda:0, n_gpu: 2, distributed training: False, 16-bits training: False
+10/28/2026 11:53:55 - INFO - __main__ - Training/evaluation parameters TrainingArguments(
 accelerator_config={'split_batches': False, 'dispatch_batches': None, 'even_batches': True, 'use_seedable_sampler': True, 'non_blocking': False, 'gradient_accumulation_kwargs': None, 'use_configured_state': False},
 adam_beta1=0.9,
 adam_beta2=0.999,
@@ -195,7 +195,7 @@ num_train_epochs=2.0,
 optim=adamw_torch,
 optim_args=None,
 optim_target_modules=None,
-output_dir=/mnt/netapp2/Store_uni//home/ulc/cursos/curso358/hpctools/results_lightning_10918155,
+output_dir=/mnt/netapp2/Store_uni//home/ulc/cursos/curso358/hpctools/results_lightning_11053157,
 parallelism_config=None,
 per_device_eval_batch_size=8,
 per_device_train_batch_size=128,
@@ -226,19 +226,19 @@ train_sampling_strategy=random,
 use_cache=False,
 use_cpu=False,
 use_liger_kernel=False,
-warmup_steps=100.0,
+warmup_steps=50.0,
 weight_decay=0.0,
 )
-10/22/2026 18:42:46 - WARNING - huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-10/22/2026 18:42:46 - WARNING - huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-10/22/2026 18:42:47 - INFO - datasets.builder - Found cached dataset squad (/home/ulc/cursos/curso358/.cache/huggingface/datasets/rajpurkar___squad/plain_text/0.0.0/7b6d24c440a36b6815f21b70d25016731768db1f)
-10/22/2026 18:42:47 - INFO - datasets.builder - Found cached dataset squad (/home/ulc/cursos/curso358/.cache/huggingface/datasets/rajpurkar___squad/plain_text/0.0.0/7b6d24c440a36b6815f21b70d25016731768db1f)
-10/22/2026 18:42:52 - INFO - datasets.arrow_dataset - Loading cached processed dataset at /home/ulc/cursos/curso358/.cache/huggingface/datasets/rajpurkar___squad/plain_text/0.0.0/7b6d24c440a36b6815f21b70d25016731768db1f/cache-adcf09bbb0783be8_*_of_00001.arrow
-10/22/2026 18:42:52 - INFO - datasets.arrow_dataset - Loading cached processed dataset at /home/ulc/cursos/curso358/.cache/huggingface/datasets/rajpurkar___squad/plain_text/0.0.0/7b6d24c440a36b6815f21b70d25016731768db1f/cache-adcf09bbb0783be8_*_of_00001.arrow
-10/22/2026 18:42:53 - INFO - datasets.arrow_dataset - Loading cached processed dataset at /home/ulc/cursos/curso358/.cache/huggingface/datasets/rajpurkar___squad/plain_text/0.0.0/7b6d24c440a36b6815f21b70d25016731768db1f/cache-505e1923b0d68a0a_*_of_00001.arrow
-10/22/2026 18:42:53 - INFO - datasets.arrow_dataset - Loading cached processed dataset at /home/ulc/cursos/curso358/.cache/huggingface/datasets/rajpurkar___squad/plain_text/0.0.0/7b6d24c440a36b6815f21b70d25016731768db1f/cache-505e1923b0d68a0a_*_of_00001.arrow
-10/22/2026 18:42:53 - INFO - __main__ - *** Evaluate ***
-10/22/2026 18:42:53 - INFO - __main__ - *** Evaluate ***
+10/28/2026 11:53:55 - WARNING - huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+10/28/2026 11:53:55 - WARNING - huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+10/28/2026 11:53:56 - INFO - datasets.builder - Found cached dataset squad (/home/ulc/cursos/curso358/.cache/huggingface/datasets/rajpurkar___squad/plain_text/0.0.0/7b6d24c440a36b6815f21b70d25016731768db1f)
+10/28/2026 11:53:56 - INFO - datasets.builder - Found cached dataset squad (/home/ulc/cursos/curso358/.cache/huggingface/datasets/rajpurkar___squad/plain_text/0.0.0/7b6d24c440a36b6815f21b70d25016731768db1f)
+10/28/2026 11:54:01 - INFO - datasets.arrow_dataset - Loading cached processed dataset at /home/ulc/cursos/curso358/.cache/huggingface/datasets/rajpurkar___squad/plain_text/0.0.0/7b6d24c440a36b6815f21b70d25016731768db1f/cache-adcf09bbb0783be8_*_of_00001.arrow
+10/28/2026 11:54:01 - INFO - datasets.arrow_dataset - Loading cached processed dataset at /home/ulc/cursos/curso358/.cache/huggingface/datasets/rajpurkar___squad/plain_text/0.0.0/7b6d24c440a36b6815f21b70d25016731768db1f/cache-adcf09bbb0783be8_*_of_00001.arrow
+10/28/2026 11:54:01 - INFO - datasets.arrow_dataset - Loading cached processed dataset at /home/ulc/cursos/curso358/.cache/huggingface/datasets/rajpurkar___squad/plain_text/0.0.0/7b6d24c440a36b6815f21b70d25016731768db1f/cache-505e1923b0d68a0a_*_of_00001.arrow
+10/28/2026 11:54:01 - INFO - datasets.arrow_dataset - Loading cached processed dataset at /home/ulc/cursos/curso358/.cache/huggingface/datasets/rajpurkar___squad/plain_text/0.0.0/7b6d24c440a36b6815f21b70d25016731768db1f/cache-505e1923b0d68a0a_*_of_00001.arrow
+10/28/2026 11:54:01 - INFO - __main__ - *** Evaluate ***
+10/28/2026 11:54:01 - INFO - __main__ - *** Evaluate ***
 ┏━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━┳━━━━━━━┓
 ┃   ┃ Name  ┃ Type                     ┃ Params ┃ Mode ┃ FLOPs ┃
 ┡━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━╇━━━━━━━┩
@@ -255,11 +255,15 @@ Total FLOPs: 0
 --- PERFORMANCE METRICS (LIGHTNING) ---
 Used GPUs (World Size): 2
 Total processed samples (excluding warmup): 164184
-Measured time (s): 500.34
-Total samples/s: 328.14
-Samples/s/GPU: 164.07
-Final Loss: 0.8994
+Measured time (s): 502.13
+Total samples/s: 326.97
+Samples/s/GPU: 163.49
+Final Loss: 0.6916
 ---------------------------------------
 
-Epoch 1/1  ━━━━━━━━━━━━━━━━ 346/346 0:04:22 • 0:00:00 3.74it/s v_num:           
-                                                               10918155.000     
+Epoch 1/1  ━━━━━━━━━━━━━━━━ 346/346 0:04:20 • 0:00:00 3.68it/s v_num:           
+                                                               11053157.000     
+                                                               train_loss_step: 
+                                                               0.655            
+                                                               train_loss_epoch:
+                                                               0.692            

@@ -1,15 +1,18 @@
 import torch
 import pytorch_lightning as pl
+from transformers import get_linear_schedule_with_warmup
 
 class QALightning(pl.LightningModule):
-    def __init__(self, model):
+    def __init__(self, model, learning_rate, warmup_steps):
         super().__init__()
         self.model = model
+        self.learning_rate = learning_rate
+        self.warmup_steps = warmup_steps
 
     def training_step(self, train_batch, batch_idx):
         outputs = self.model(**train_batch)
         loss = outputs.loss
-        self.log("train_loss", loss)
+        self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True, sync_dist=True)
         return loss
 
     def forward(self, batch):
@@ -34,8 +37,21 @@ class QALightning(pl.LightningModule):
                 "weight_decay": 0.0,
             },
         ]
-        optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=3e-5)
-        return optimizer
+        optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=self.learning_rate)
+
+        scheduler = get_linear_schedule_with_warmup(
+            optimizer,
+            num_warmup_steps=self.warmup_steps,
+            num_training_steps=self.trainer.estimated_stepping_batches,
+        )
+        return {
+            "optimizer": optimizer, 
+            "lr_scheduler": {
+                "scheduler": scheduler, 
+                "interval": "step",
+                "frequency": 1,
+            }
+        }
 
     def validation_step(self, val_batch, batch_idx):
         outputs = self.model(**val_batch)

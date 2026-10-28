@@ -26,7 +26,7 @@ srun python -u run_qa_lightning.py \
   --per_device_train_batch_size 128 \
   --dataloader_num_workers 4 \
   --learning_rate 6.399e-4 \
-  --warmup_steps 100 \
+  --warmup_steps 50 \
   --dataloader_pin_memory True \
   --num_train_epochs 2 \
   --max_seq_length 384 \

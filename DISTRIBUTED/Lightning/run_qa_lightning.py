@@ -601,7 +601,11 @@ def main():
         )
 
     # model
-    lightning_model = QALightning(model)
+    lightning_model = QALightning(
+        model, 
+        learning_rate=training_args.learning_rate,
+        warmup_steps=training_args.warmup_steps
+    )
 
     profiler = PyTorchProfiler(
         dirpath=training_args.output_dir,
