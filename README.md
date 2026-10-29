@@ -5,7 +5,7 @@
 
 ## BASELINE - Deliverable 1
 ### Key contents
-The baseline implementation is obtained from the following repo: https://github.com/huggingface/transformers/tree/main/examples/pytorch/question-answering
+The baseline implementation is obtained from the following repo: https://github.com/huggingface/transformers/tree/v4.36.0/examples/pytorch/question-answering
 ### Hugging face repo
 #### run_qa.py
 This file is in charge of the full training workflow of BERT-uncased model using SQUAD dataset. The script supports different training configurations via several arguments handled by `HfArgumentParser` class. For this purpose 3 python classes are created: 
@@ -284,7 +284,7 @@ profiler = PyTorchProfiler(
     )
 ```
 #### Implementation
-To enable the distributed training implementation, the original QA class was entirely refactored into a PyTorch Lightning module (trainer_qa_lightning.py), incorporating the following methods:
+To enable the distributed training implementation, the original QA class was entirely refactored into a PyTorch Lightning module (`trainer_qa_lightning.py`), incorporating the following methods:
 ````python
 import torch
 import pytorch_lightning as pl
@@ -366,7 +366,7 @@ Several versions of the new model exhibited overfitting, characterized by an ini
 
 Additionally, for the warmup steps, a dedicated learning rate scheduler was implemented via the `configure_optimizer()` method. This scheduler dynamically adjusts the learning rate throughout the training iterations. Specifically, its warmup phase initiates with a minimal value and progressively scales it up during the initial steps, stabilizing the model training and preventing gradient explosion or collapse.
 
-It was also required to integrate two specific callbacks into the training phase: PerformanceMonitorLightning and an early stopping mechanism (early_stop_callback). The former was designed to discard the initial training steps by treating them as a warmup phase, while the latter was implemented to mitigate the overfitting issues observed in previous iterations.
+It was also required to integrate two specific callbacks into the training phase: PerformanceMonitorLightning and an early stopping mechanism (`early_stop_callback`). The former was designed to discard the initial training steps by treating them as a warmup phase, while the latter was implemented to mitigate the overfitting issues observed in previous iterations.
 `````python
 class PerformanceMonitorLightning(Callback):
     def __init__(self, warmup_steps=50):
@@ -495,7 +495,7 @@ This implementation natively supports both Accelerate and distributed training p
 | Training | 2 | 10:31.89 | 280.084 | 140.042 | 32309300 | 4,66x| 8.19 | 0.6746 |
 | Evaluation | 2 | 00:10.52 | 1021.721 | 510,8605 | - | 6,03x | - | - |
 
-For this implementation, execution time improvements were similarly driven by the factors identified in the Lightning setup, namely the increased batch size and the activation of bf16 mixed precision. However, a Model Flops Utilization (MFU) below 10% indicates that the code remains suboptimal in terms of hardware efficiency. Target values typically range between 20% and 40%—as addressed during coursework—or even exceed 40% in highly optimized distributed environments.
+For this implementation, execution time improvements were similarly driven by the factors identified in the Lightning setup, namely the increased batch size and the activation of bf16 mixed precision. However, a MFU below 10% indicates that the code remains suboptimal in terms of hardware efficiency. Target values typically range between 20% and 40%—as addressed during coursework—or even exceed 40% in highly optimized distributed environments.
 
 #### Profiling results
 ![alt text](./DISTRIBUTED/images/Cap5.png)
